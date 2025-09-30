@@ -5,18 +5,27 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-
-const links = [
-  { href: '/', label: 'Home' },
-  { href: '/browse', label: 'Browse' },
-  { href: '/collections', label: 'Collections' },
-  { href: '/dashboard', label: 'Dashboard' },
-  { href: '/admin', label: 'Admin' }
-];
+import { useSession, signOut } from 'next-auth/react';
 
 export function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { data: session, status } = useSession();
+
+  const isAuthenticated = status === 'authenticated';
+
+  const navLinks = [
+    { href: '/', label: 'Home' },
+    { href: '/browse', label: 'Browse' },
+    { href: '/collections', label: 'Collections' }
+  ];
+
+  if (isAuthenticated) {
+    navLinks.push({ href: '/dashboard', label: 'Dashboard' });
+  }
+
+  const profileInitial = session?.user?.name?.charAt(0)?.toUpperCase() ?? session?.user?.email?.charAt(0)?.toUpperCase() ?? 'U';
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/70 dark:bg-slate-900/60 border-b border-white/20 dark:border-white/10">
@@ -32,7 +41,7 @@ export function Navbar() {
         </Link>
 
         <div className="hidden lg:flex items-center gap-8">
-          {links.map((link) => {
+          {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
@@ -58,6 +67,45 @@ export function Navbar() {
             Become a Creator
           </Link>
           <ThemeToggle />
+          {isAuthenticated ? (
+            <div className="relative">
+              <button
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-slate-900 font-semibold shadow-glass focus:outline-none focus:ring-2 focus:ring-primary/40"
+                onClick={() => setIsProfileOpen((prev) => !prev)}
+                aria-haspopup="true"
+                aria-expanded={isProfileOpen}
+              >
+                {profileInitial}
+              </button>
+              {isProfileOpen ? (
+                <div className="absolute right-0 mt-3 w-48 rounded-2xl border border-white/20 bg-white/90 dark:bg-slate-900/90 shadow-2xl p-2 space-y-1">
+                  <Link
+                    href="/dashboard"
+                    className="block rounded-xl px-4 py-2 text-sm font-medium text-slate-700 hover:bg-primary/10 dark:text-slate-200 dark:hover:bg-primary/20"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    className="w-full text-left rounded-xl px-4 py-2 text-sm font-medium text-slate-700 hover:bg-primary/10 dark:text-slate-200 dark:hover:bg-primary/20"
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      void signOut({ callbackUrl: '/' });
+                    }}
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <Link
+              href="/signin"
+              className="hidden md:inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold text-white bg-primary shadow-glass hover:shadow-glass/70 transition"
+            >
+              Sign in
+            </Link>
+          )}
           <button
             className="lg:hidden inline-flex items-center justify-center rounded-full border border-white/30 bg-white/80 dark:bg-white/10 w-10 h-10"
             onClick={() => setIsOpen((prev) => !prev)}
@@ -71,7 +119,7 @@ export function Navbar() {
       {isOpen ? (
         <div className="lg:hidden border-t border-white/20 dark:border-white/5 bg-white/80 dark:bg-slate-900/80">
           <div className="container flex flex-col gap-2 py-4">
-            {links.map((link) => (
+            {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -88,6 +136,34 @@ export function Navbar() {
             >
               Become a Creator
             </Link>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white bg-primary"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <button
+                  className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-slate-900 bg-white/80 dark:bg-white/10 dark:text-slate-100 border border-white/40 dark:border-white/10"
+                  onClick={() => {
+                    setIsOpen(false);
+                    void signOut({ callbackUrl: '/' });
+                  }}
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/signin"
+                className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white bg-primary"
+                onClick={() => setIsOpen(false)}
+              >
+                Sign in
+              </Link>
+            )}
           </div>
         </div>
       ) : null}

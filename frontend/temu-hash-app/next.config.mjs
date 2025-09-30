@@ -19,9 +19,6 @@ const nextConfig = {
         hostname: '*.googleusercontent.com'
       }
     ]
-  },
-  experimental: {
-    serverActions: true
   }
 };
 

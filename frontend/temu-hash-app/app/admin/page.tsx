@@ -1,8 +1,17 @@
 import { AdminOverview } from '@/components/sections/admin-overview';
 import { ModerationQueue } from '@/components/sections/moderation-queue';
 import { PlatformMetrics } from '@/components/sections/platform-metrics';
+import { auth } from '@/lib/auth';
+import { AdminGate } from '@/components/auth/admin-gate';
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  const session = await auth();
+  const isAdmin = session?.user?.role === 'admin';
+
+  if (!isAdmin) {
+    return <AdminGate />;
+  }
+
   return (
     <div className="container py-12 space-y-10">
       <header className="space-y-3">

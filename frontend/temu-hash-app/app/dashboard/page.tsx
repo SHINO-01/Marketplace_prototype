@@ -1,8 +1,16 @@
+import { redirect } from 'next/navigation';
 import { CreatorOverview } from '@/components/sections/creator-overview';
 import { SalesInsights } from '@/components/sections/sales-insights';
 import { TasksTimeline } from '@/components/sections/tasks-timeline';
+import { auth } from '@/lib/auth';
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect('/signin?callbackUrl=/dashboard');
+  }
+
   return (
     <div className="container py-12 space-y-10">
       <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

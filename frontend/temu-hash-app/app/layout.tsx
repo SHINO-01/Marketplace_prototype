@@ -4,6 +4,7 @@ import './globals.css';
 import { Providers } from '@/components/providers/providers';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
+import { auth } from '@/lib/auth';
 
 const fontSans = Plus_Jakarta_Sans({ subsets: ['latin'] });
 
@@ -22,11 +23,13 @@ export const metadata: Metadata = {
   ]
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={fontSans.className}>
-        <Providers>
+        <Providers session={session}>
           <div className="min-h-screen flex flex-col">
             <Navbar />
             <main className="flex-1 flex flex-col">{children}</main>
