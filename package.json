@@ -1,0 +1,11 @@
+{
+  "name": "temuhash-monorepo",
+  "private": true,
+  "license": "UNLICENSED",
+  "workspaces": [
+    "frontend/temu-hash-app"
+  ],
+  "scripts": {
+    "lint": "npm run lint --workspaces"
+  }
+}

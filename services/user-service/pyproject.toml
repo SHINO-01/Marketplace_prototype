@@ -1,0 +1,16 @@
+[project]
+name = "temuhash-user-service"
+version = "0.1.0"
+description = "User profile and roles microservice"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.111.0",
+  "uvicorn[standard]>=0.30.1",
+  "sqlalchemy[asyncio]>=2.0.30",
+  "asyncpg>=0.29.0",
+  "alembic>=1.13.1",
+  "pydantic-settings>=2.3.0",
+  "grpcio>=1.64.0",
+  "grpcio-tools>=1.64.0",
+  "python-jose[cryptography]>=3.3.0"
+]
